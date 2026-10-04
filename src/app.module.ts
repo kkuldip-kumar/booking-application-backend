@@ -8,6 +8,7 @@ import { authConfig } from './config/auth.config';
 import { databaseConfig } from './config/database.config';
 import { validateEnv } from './config/env.validation';
 import { mailConfig } from './config/mail.config';
+import { AuditLog } from './modules/audit/entities/audit-log.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { RefreshToken } from './modules/auth/entities/refresh-token.entity';
 import { VerificationToken } from './modules/auth/entities/verification-token.entity';
@@ -16,7 +17,7 @@ import { Role } from './modules/rbac/entities/role.entity';
 import { UserRole } from './modules/rbac/entities/user-role.entity';
 import { User } from './modules/users/entities/user.entity';
 
-export const ENTITIES = [User, Role, Permission, UserRole, RefreshToken, VerificationToken];
+export const ENTITIES = [User, Role, Permission, UserRole, RefreshToken, VerificationToken, AuditLog];
 
 @Module({
   imports: [

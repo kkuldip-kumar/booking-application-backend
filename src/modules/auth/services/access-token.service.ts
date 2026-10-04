@@ -9,6 +9,7 @@ interface AccessPayload {
   email: string;
   roles: string[];
   permissions: string[];
+  cinemaIds?: string[];
 }
 
 @Injectable()
@@ -24,7 +25,11 @@ export class AccessTokenService {
 
   sign(user: JwtUser): Promise<string> {
     const payload: AccessPayload = {
-      sub: user.id, email: user.email, roles: [...user.roles], permissions: [...user.permissions],
+      sub: user.id,
+      email: user.email,
+      roles: [...user.roles],
+      permissions: [...user.permissions],
+      cinemaIds: [...user.cinemaIds],
     };
     return this.jwt.signAsync(payload, {
       secret: this.cfg.jwtAccessSecret, algorithm: 'HS256', expiresIn: this.cfg.jwtAccessTtlSeconds,
@@ -36,7 +41,13 @@ export class AccessTokenService {
       const p = await this.jwt.verifyAsync<AccessPayload>(token, {
         secret: this.cfg.jwtAccessSecret, algorithms: ['HS256'],
       });
-      return { id: p.sub, email: p.email, roles: p.roles, permissions: p.permissions };
+      return {
+        id: p.sub,
+        email: p.email,
+        roles: p.roles,
+        permissions: p.permissions,
+        cinemaIds: p.cinemaIds ?? [],
+      };
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
