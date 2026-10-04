@@ -40,8 +40,8 @@ export class SessionService {
   }
 
   private async build(user: User, refresh: IssuedRefreshToken): Promise<AuthSession> {
-    const { roles, permissions } = await this.rbac.getAuthorities(user.id);
-    const accessToken = await this.access.sign({ id: user.id, email: user.email, roles, permissions });
+    const { roles, permissions, cinemaIds } = await this.rbac.getAuthorities(user.id);
+    const accessToken = await this.access.sign({ id: user.id, email: user.email, roles, permissions, cinemaIds });
     return {
       user, accessToken, refresh, roles, permissions,
       accessExpiresAt: new Date(Date.now() + this.access.ttlSeconds * 1000),

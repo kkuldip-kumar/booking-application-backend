@@ -10,6 +10,7 @@ import { UserRole } from './entities/user-role.entity';
 export interface Authorities {
   readonly roles: string[];
   readonly permissions: string[];
+  readonly cinemaIds: string[];
 }
 
 @Injectable()
@@ -27,11 +28,13 @@ export class RbacService {
     });
     const roles = new Set<string>();
     const permissions = new Set<string>();
-    for (const { role } of assignments) {
-      roles.add(role.name);
-      role.permissions.forEach((p) => permissions.add(p.code));
+    const cinemaIds = new Set<string>();
+    for (const assignment of assignments) {
+      roles.add(assignment.role.name);
+      assignment.role.permissions.forEach((p) => permissions.add(p.code));
+      if (assignment.cinemaId) cinemaIds.add(assignment.cinemaId);
     }
-    return { roles: [...roles], permissions: [...permissions] };
+    return { roles: [...roles], permissions: [...permissions], cinemaIds: [...cinemaIds] };
   }
 
   async assignDefaultRole(userId: string): Promise<void> {

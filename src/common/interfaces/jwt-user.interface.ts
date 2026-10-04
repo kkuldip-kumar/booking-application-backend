@@ -3,6 +3,8 @@ export interface JwtUser {
   readonly email: string;
   readonly roles: readonly string[];
   readonly permissions: readonly string[];
+  /** Cinemas the user may administer (from cinema-scoped role assignments). */
+  readonly cinemaIds: readonly string[];
 }
 
 export interface ClientContext {
