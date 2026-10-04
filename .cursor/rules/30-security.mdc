@@ -1,0 +1,18 @@
+---
+description: Auth, validation, secrets, payment safety
+globs: src/**/*.ts
+alwaysApply: false
+---
+# Security Rules (details in @docs/SECURITY.md)
+
+- Passwords: `argon2` (or bcrypt cost ≥ 12). Never log or return hashes.
+- JWT: access 15m, refresh 7d, refresh tokens stored hashed and rotated; revoke on logout.
+- All routes protected by default (global `JwtAuthGuard`); public ones use `@Public()`.
+- RBAC via `@Roles()`: `USER`, `ADMIN`. Check ownership: a user only accesses own bookings.
+- Validate ALL input with DTOs; whitelist enabled. Validate UUID params with `ParseUUIDPipe`.
+- Secrets only via env; `.env` never committed; validate env at boot.
+- Rate limit with `@nestjs/throttler`: strict on `/auth/*`, booking and payment endpoints.
+- Helmet + CORS allowlist. No stack traces in responses.
+- Payment webhooks: verify signature, reject replays, process idempotently. Never trust client-sent amount; compute server-side from show price.
+- Don't log PII, tokens, card data, or full request bodies.
+- Parameterized queries only.

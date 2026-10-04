@@ -1,0 +1,26 @@
+---
+description: Project stack and global conventions
+alwaysApply: true
+---
+# Project
+BookMyShow-style ticket booking backend. See @AGENTS.md and @docs/ARCHITECTURE.md.
+
+## Stack
+NestJS (TypeScript strict), PostgreSQL, TypeORM, Redis/BullMQ, JWT, Jest.
+
+## Conventions
+- Modular monolith: one folder per domain in `src/modules/<name>/`.
+- File names: kebab-case (`create-booking.dto.ts`); classes PascalCase; DB columns snake_case.
+- API prefix `/api/v1`. Responses: `{ success, data, message }` via global interceptor.
+- Config via `@nestjs/config` + validated env schema. Never read `process.env` directly in modules.
+- Money: integer minor units (paise) in `bigint`/`int`. Never floats.
+- Timestamps: `timestamptz`, UTC.
+- IDs: UUID v4 for public entities.
+- No `any`. No unused code. No commented-out code. No console.log (use Nest `Logger`).
+- Keep functions small; business logic in services only.
+
+## Workflow
+- Do one task at a time from `docs/TASKS.md`.
+- Don't add dependencies without asking.
+- Before saying a task is done: run lint, build, tests and report results.
+- Record gotchas in `docs/MEMORY.md`.

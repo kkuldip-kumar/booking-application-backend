@@ -1,0 +1,17 @@
+---
+description: Code quality standards for TypeScript
+globs: src/**/*.ts
+alwaysApply: false
+---
+# Code Quality
+- TypeScript strict. No `any`; use `unknown` + narrowing. No non-null `!` without a reason.
+- Functions ≤ 40 lines, ≤ 4 params (use an object beyond that). Early returns over deep nesting.
+- Single responsibility per class/file; files ≤ 300 lines.
+- Names describe intent (`holdSeats`, not `process`). Booleans: `is/has/can`.
+- No magic numbers/strings: constants or enums in `common/`.
+- No dead code, commented-out code, TODOs without a TASKS.md entry, or `console.log` (use Nest `Logger`).
+- Handle errors explicitly; never swallow with empty `catch`.
+- `async/await` only; always await or return promises; no floating promises.
+- Prefer `readonly`, `const`, immutable data.
+- Comments explain WHY, not WHAT.
+- Match existing style; run `npm run lint -- --fix` before finishing.

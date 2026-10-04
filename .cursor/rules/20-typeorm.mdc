@@ -1,0 +1,21 @@
+---
+description: TypeORM entities, migrations, transactions
+globs: src/**/*.entity.ts, src/database/**/*.ts, src/modules/**/*.service.ts
+alwaysApply: false
+---
+# TypeORM Rules
+
+- `synchronize: false` ALWAYS. Schema changes via migrations only.
+- Never edit a migration that has been run; create a new one. Migrations must have working `down()`.
+- Entities: `@Entity('snake_case_plural')`, UUID PK (`@PrimaryGeneratedColumn('uuid')`), `created_at`/`updated_at` (`timestamptz`), explicit column types, explicit `@Index`/unique constraints.
+- Enums: Postgres enum or `varchar` + CHECK; define TS enum in `common/enums`.
+- Relations: lazy loading off; load with `relations` or QueryBuilder explicitly. Avoid N+1.
+- Select only needed columns for list endpoints.
+- Money as integer minor units.
+
+## Transactions & concurrency (critical for booking)
+- Multi-table writes use `DataSource.transaction()` / `QueryRunner`. Pass the `EntityManager` down; never mix repositories outside the tx.
+- Seat hold: `SELECT ... FOR UPDATE SKIP LOCKED` (or `setLock('pessimistic_write')`) on `show_seats`, in one transaction. See `docs/adr/0001-seat-locking-strategy.md`.
+- Enforce invariants in DB: unique `(show_id, seat_id)`, FK constraints, CHECKs. Don't rely on app checks alone.
+- Idempotency: payments/webhooks use unique `idempotency_key` / `gateway_payment_id`.
+- Raw SQL only with parameters (`$1`), never string concatenation.

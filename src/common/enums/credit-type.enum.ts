@@ -1,0 +1,7 @@
+export enum CreditType {
+  DIRECTOR = 'DIRECTOR',
+  CAST = 'CAST',
+  WRITER = 'WRITER',
+  PRODUCER = 'PRODUCER',
+  CINEMATOGRAPHER = 'CINEMATOGRAPHER',
+}

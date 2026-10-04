@@ -1,0 +1,33 @@
+---
+description: NestJS module, controller, service, DTO patterns
+globs: src/**/*.ts
+alwaysApply: false
+---
+# NestJS Patterns
+
+## Module layout
+```
+modules/<name>/
+  dto/ entities/ <name>.controller.ts <name>.service.ts <name>.module.ts
+```
+
+## Rules
+- Controllers: routing, DTO binding, guards, Swagger decorators only. No business logic, no repositories.
+- Services: business logic; inject repositories via `@InjectRepository`.
+- One DTO per request; use `class-validator` + `class-transformer`. Responses use explicit response DTOs, never raw entities.
+- Global `ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })`.
+- Use built-in exceptions (`NotFoundException`, `ConflictException`, ...) or custom ones in `common/exceptions`. No generic `Error`.
+- Guards for auth/roles (`JwtAuthGuard`, `RolesGuard`); decorators `@Public()`, `@Roles()`, `@CurrentUser()`.
+- Inter-module access via exported services only; avoid circular deps (no `forwardRef` unless approved).
+- Pagination: `?page=1&limit=20`, max limit 100, return `{ items, meta }`.
+- Every endpoint has `@ApiTags`, `@ApiOperation`, response decorators.
+- Async work (email, expiry) goes to BullMQ processors, not inline.
+
+## Example
+```ts
+@Post()
+@Roles(Role.USER)
+create(@CurrentUser() user: JwtUser, @Body() dto: CreateBookingDto) {
+  return this.bookingsService.create(user.id, dto);
+}
+```

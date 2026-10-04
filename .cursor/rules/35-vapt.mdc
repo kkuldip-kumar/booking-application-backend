@@ -1,0 +1,37 @@
+---
+description: VAPT secure-coding gate for AI-generated code
+globs: src/**/*.ts, test/**/*.ts
+alwaysApply: false
+---
+# VAPT Gate (OWASP API Top 10:2023 / ASVS L2). Full list: @docs/VAPT.md
+
+## NEVER generate
+- Endpoints without guards, or without an ownership check (`where: { id, userId }`).
+- `findOne(id)` for user-owned data without scoping by the current user (IDOR/BOLA).
+- Mass assignment: no `repo.save(body)`; map DTO fields explicitly. Role/status/price/userId never come from the client.
+- String-built SQL, `eval`, `child_process` with user input, dynamic `require`.
+- `Math.random()` for tokens/refs; use `crypto.randomUUID()` / `crypto.randomBytes()`.
+- Secret/hash comparison with `===`; use `crypto.timingSafeEqual`.
+- Logging of passwords, tokens, PII, payloads with secrets.
+- Stack traces, SQL errors, or entity internals in responses.
+- Wildcard CORS, `synchronize: true`, Swagger enabled in production.
+- New dependencies without asking (supply chain).
+
+## ALWAYS
+- Global guard default-deny; `@Public()` only for: register, login, refresh, catalog GETs, payment webhook (signature-verified).
+- Generic auth errors ("Invalid credentials"); same response time/shape for unknown user vs wrong password.
+- Webhook: use raw body, verify HMAC with `timingSafeEqual`, check timestamp (±5 min), idempotent on `gateway_payment_id`.
+- Price, total, seat status computed server-side only.
+- Throttle: auth, hold, booking, payment, webhook.
+- Pagination `limit` capped at 100; reject unknown query params.
+- `ParseUUIDPipe` on every id param.
+- Responses via response DTOs (no `password_hash`, tokens, internal fields).
+- Audit-log admin actions and payment state changes (who, what, when, requestId).
+
+## Self-review before "done" (print this checklist with yes/no)
+1. Every new route: guard? role? ownership scoped?
+2. Any client-controlled field that affects money, role, status, ownership?
+3. Any new input reaching SQL/shell/URL/file path?
+4. Any sensitive data in logs/responses?
+5. Abuse case covered in @docs/THREAT_MODEL.md? Test added in `test/security/`?
+6. Ran: `npm run lint && npm run build && npm run test && npm audit --omit=dev`; output pasted.

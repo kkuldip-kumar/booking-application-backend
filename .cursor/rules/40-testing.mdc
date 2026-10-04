@@ -1,0 +1,16 @@
+---
+description: Testing rules for unit and e2e tests
+globs: **/*.spec.ts, test/**
+alwaysApply: false
+---
+# Testing Rules (details in @docs/TESTING.md)
+
+- Unit tests next to source: `*.service.spec.ts`. Mock repositories/external services.
+- E2E in `test/e2e/*.e2e-spec.ts` against a real Postgres test DB (docker), migrations run before suite, truncate between tests.
+- Structure: Arrange / Act / Assert; one behavior per test; descriptive names (`should reject booking when seat already held`).
+- Must cover: happy path, validation errors, auth/ownership failures, and concurrency for booking.
+- Concurrency test: fire N parallel requests for the same seat; exactly one succeeds.
+- No real network calls; mock payment gateway and email.
+- Don't weaken or delete a test to make it pass; fix the code or ask.
+- Coverage targets: services ≥ 80%, booking/payment ≥ 90%.
+- Report actual `npm run test` output when claiming completion.
