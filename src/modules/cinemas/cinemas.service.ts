@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { DEFAULT_COUNTRY, DEFAULT_TIMEZONE } from '../../common/constants/cinema.constants';
 import { CinemaStatus } from '../../common/enums/cinema.enums';
 import { JwtUser } from '../../common/interfaces/jwt-user.interface';
@@ -96,6 +96,12 @@ export class CinemasService {
 
   async assertExists(id: string): Promise<void> {
     if (!(await this.cinemas.existsBy({ id }))) throw new NotFoundException('Cinema not found');
+  }
+
+  async assertAllExist(ids: readonly string[]): Promise<void> {
+    const unique = [...new Set(ids)];
+    if (unique.length === 0) return;
+    if ((await this.cinemas.count({ where: { id: In(unique) } })) !== unique.length) throw new NotFoundException('One or more cinemas not found');
   }
 
   private async findOwnedOrFail(user: JwtUser, id: string): Promise<Cinema> {

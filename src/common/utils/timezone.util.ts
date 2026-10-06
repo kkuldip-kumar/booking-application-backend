@@ -43,3 +43,20 @@ export function formatIsoDate(ms: number): string {
 export function daysBetweenInclusive(fromMs: number, toMs: number): number {
   return Math.floor((toMs - fromMs) / MS_PER_DAY) + 1;
 }
+
+const WEEKDAY_INDEX: Readonly<Record<string, number>> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+/** Day of week (0=Sunday) and minutes since local midnight for `date` as seen in `timeZone`. */
+export function localDayAndMinutes(date: Date, timeZone: string): { dayOfWeek: number; minutesOfDay: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone, weekday: 'short', hourCycle: 'h23', hour: '2-digit', minute: '2-digit',
+  }).formatToParts(date);
+  const value = (type: string): string => parts.find((p) => p.type === type)?.value ?? '';
+  return { dayOfWeek: WEEKDAY_INDEX[value('weekday')], minutesOfDay: Number(value('hour')) * 60 + Number(value('minute')) };
+}
+
+/** "HH:mm" or "HH:mm:ss" -> minutes since midnight. */
+export function clockToMinutes(clock: string): number {
+  const [hours, minutes] = clock.split(':').map(Number);
+  return hours * 60 + minutes;
+}
