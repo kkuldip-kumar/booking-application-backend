@@ -18,7 +18,7 @@ usage() {
     echo "  restart    - Restart all services."
     echo "  logs       - View logs (use: ./docker.sh logs [service])."
     echo "  ps         - List running containers for this project."
-    echo "  shell      - Open a shell inside the 'dst-backend' container."
+    echo "  shell      - Open a shell inside the 'ticket-backend' container."
     echo "  prune      - Stop containers and remove all unused Docker data."
     echo ""
     echo "Example:"
@@ -68,8 +68,8 @@ case "$COMMAND" in
         docker compose ps "$@"
         ;;
     shell)
-        echo -e "${GREEN}==> Opening shell in 'dst-backend' container...${NC}"
-        docker compose exec dst-backend sh "$@"
+        echo -e "${GREEN}==> Opening shell in 'ticket-backend' container...${NC}"
+        docker compose exec ticket-backend sh "$@"
         ;;
     prune)
         echo -e "${YELLOW} WARNING: This will stop services and remove all unused Docker data.${NC}"

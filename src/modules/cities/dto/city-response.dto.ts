@@ -1,4 +1,3 @@
-// src/modules/cities/dto/city-response.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import { City } from '../entities/city.entity';
 

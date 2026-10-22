@@ -1,4 +1,3 @@
-// src/modules/cities/entities/city.entity.ts
 import {
   Column, CreateDateColumn, Entity, Index, OneToMany,
   PrimaryGeneratedColumn, UpdateDateColumn,
