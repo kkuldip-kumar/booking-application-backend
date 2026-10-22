@@ -7,7 +7,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { JwtUser } from '../../common/interfaces/jwt-user.interface';
-import { Paginated } from '../../common/utils/paginate';
+import { Paginated } from '../../common/utils/pagination.util';
 import { CitiesService } from './cities.service';
 import { CityResponseDto } from './dto/city-response.dto';
 import { CreateCityDto } from './dto/create-city.dto';
@@ -15,7 +15,7 @@ import { AdminQueryCitiesDto } from './dto/query-cities.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
 
 @ApiTags('admin-cities')
-@Roles(Role.ADMIN)
+@Roles(Role.CINEMA_ADMIN)
 @Controller('admin/cities')
 export class AdminCitiesController {
   constructor(private readonly citiesService: CitiesService) {}

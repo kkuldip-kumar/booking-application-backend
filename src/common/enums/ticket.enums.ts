@@ -1,0 +1,20 @@
+export enum TicketStatus {
+  ISSUED = 'ISSUED',
+  CHECKED_IN = 'CHECKED_IN',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+}
+
+export enum ScanResult {
+  VALID = 'VALID',
+  ALREADY_USED = 'ALREADY_USED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+  WRONG_SESSION = 'WRONG_SESSION',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export enum ScanMethod {
+  DEVICE_SCAN = 'DEVICE_SCAN',
+  MANUAL_OVERRIDE = 'MANUAL_OVERRIDE',
+}

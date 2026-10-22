@@ -1,19 +1,46 @@
+# Dependencies
 node_modules/
+.pnpm-store/
+
+# Build / compiled output
 dist/
 build/
+.next/
+out/
+
+# Test / coverage
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+
+# Logs
 logs/
 *.log
+
+# Environment / secrets
 .env
 .env.*
 !.env.example
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-*.min.js
-*.map
+
+# Git / IDE
 .git/
 .DS_Store
-uploads/
+.vscode/
+
+# Generated / temporary files
 tmp/
+temp/
+.cache/
+
+# Graphify generated data
+graphify-out/
+.graphify/
+.graphify_analysis.json
+
+# Generated application data
+uploads/
+generated/
+# Graphify
+graphify-out/
+.graphify/

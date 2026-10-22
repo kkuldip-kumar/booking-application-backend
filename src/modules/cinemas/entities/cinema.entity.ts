@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { CinemaStatus } from '../../../common/enums/cinema.enums';
 import { CinemaImage } from './cinema-image.entity';
+import { City } from '../../cities/entities/city.entity';
 
 @Entity('cinemas')
 @Index('idx_cinemas_city_status', ['city', 'status'])
@@ -9,7 +10,7 @@ export class Cinema {
   @Column({ type: 'varchar', length: 20, unique: true }) code!: string;
   @Column({ type: 'varchar', length: 150 }) name!: string;
   @Column({ name: 'address_line', type: 'varchar', length: 255 }) addressLine!: string;
-  @Column({ type: 'varchar', length: 100 }) city!: string;
+  // @Column({ type: 'varchar', length: 100 }) city!: string;
   @Column({ type: 'varchar', length: 100 }) state!: string;
   @Column({ type: 'varchar', length: 2 }) country!: string;
   @Column({ name: 'postal_code', type: 'varchar', length: 12 }) postalCode!: string;
@@ -23,6 +24,15 @@ export class Cinema {
   @Column({ type: 'text', array: true, default: () => "'{}'" }) facilities!: string[];
   @Column({ type: 'enum', enum: CinemaStatus, enumName: 'cinema_status', default: CinemaStatus.ACTIVE }) status!: CinemaStatus;
   @OneToMany(() => CinemaImage, (image) => image.cinema) images?: CinemaImage[];
+  @Index('idx_cinemas_city_id')
+  @Column({ name: 'city_id', type: 'uuid' })
+  cityId!: string;
+  @ManyToOne(() => City, (city) => city.cinemas, {
+    nullable: false,
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'city_id' })
+  city!: City;
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' }) createdAt!: Date;
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' }) updatedAt!: Date;
 }

@@ -2,7 +2,7 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
-import { Paginated } from '../../common/utils/paginate';
+import { Paginated } from '../../common/utils/pagination.util';
 import { CitiesService } from './cities.service';
 import { CityResponseDto } from './dto/city-response.dto';
 import { QueryCitiesDto } from './dto/query-cities.dto';

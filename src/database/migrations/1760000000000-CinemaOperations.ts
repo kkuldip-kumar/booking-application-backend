@@ -14,7 +14,6 @@ export class CinemaOperations1760000000000 implements MigrationInterface {
       CREATE TYPE seat_status AS ENUM ('ACTIVE','BLOCKED');
       CREATE TYPE showtime_status AS ENUM ('SCHEDULED','BLOCKED','CANCELLED','COMPLETED');
       CREATE TYPE showtime_seat_status AS ENUM ('AVAILABLE','HELD','BOOKED','BLOCKED');
-      CREATE TYPE credit_type AS ENUM ('DIRECTOR','CAST','WRITER','PRODUCER','CINEMATOGRAPHER','COMPOSER');
     `);
     await q.query(`
       CREATE TABLE cinemas (

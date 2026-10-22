@@ -1,9 +1,8 @@
 // src/modules/payments/modes/wallet.strategy.ts
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PaymentMode } from '../../../common/enums/payment-mode.enum';
-import { SUPPORTED_WALLETS } from '../payments.constants';
-import { ModeInput, PaymentModeStrategy, ResolvedMode } from './payment-mode.strategy';
-
+import { PaymentMode } from '../../common/enums/payment-mode.enum';
+import { SUPPORTED_WALLETS } from './payments.constants';
+import { ModeInput, PaymentModeStrategy, ResolvedMode } from './modes/payment-mode.strategy';
 @Injectable()
 export class WalletStrategy implements PaymentModeStrategy {
   readonly mode = PaymentMode.WALLET;

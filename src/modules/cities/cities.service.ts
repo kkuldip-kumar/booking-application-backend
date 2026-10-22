@@ -2,10 +2,10 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Paginated, toPaginated } from '../../common/utils/paginate';
+import { Paginated, toPaginated } from '../../common/utils/pagination.util';
 import { isForeignKeyViolation, isUniqueViolation } from '../../common/utils/db-errors';
 import { slugify } from '../../common/utils/slugify';
-import { AuditLogsService } from '../audit-logs/audit-logs.service';
+import { AuditLogService } from '../audit/audit-log.service';
 import { AdminQueryCitiesDto } from './dto/query-cities.dto';
 import { CreateCityDto } from './dto/create-city.dto';
 import { UpdateCityDto } from './dto/update-city.dto';
@@ -17,7 +17,7 @@ const CITY_EXISTS_MESSAGE = 'City already exists';
 export class CitiesService {
   constructor(
     @InjectRepository(City) private readonly cities: Repository<City>,
-    private readonly audit: AuditLogsService,
+    private readonly audit: AuditLogService,
   ) {}
 
   async findAll(query: AdminQueryCitiesDto, includeInactive: boolean): Promise<Paginated<City>> {

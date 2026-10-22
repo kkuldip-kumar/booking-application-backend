@@ -11,9 +11,10 @@ import { JwtUser } from '../../common/interfaces/jwt-user.interface';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { PaymentIntentResponseDto, PaymentStatusResponseDto } from './dto/payment-response.dto';
 import { PaymentsService } from './payments.service';
+import { IdempotencyKey } from '../../common/decorators/idempotency-key.decorator';
 
 @ApiTags('payments')
-@Roles(Role.USER)
+@Roles(Role.CUSTOMER)
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
@@ -25,7 +26,7 @@ export class PaymentsController {
   @ApiOkResponse({ type: PaymentIntentResponseDto })
   createIntent(
     @CurrentUser() user: JwtUser,
-    @Headers('idempotency-key', new ParseUUIDPipe({ version: '4' })) idempotencyKey: string,
+    @IdempotencyKey() idempotencyKey: string,
     @Body() dto: CreatePaymentIntentDto,
   ): Promise<PaymentIntentResponseDto> {
     return this.paymentsService.createIntent(user.id, dto, idempotencyKey);

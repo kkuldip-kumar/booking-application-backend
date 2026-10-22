@@ -30,16 +30,21 @@ export class CinemasService {
 
   async create(dto: CreateCinemaDto): Promise<CinemaResponseDto> {
     try {
-      const saved = await this.cinemas.save(
-        this.cinemas.create({
-          code: dto.code, name: dto.name, addressLine: dto.addressLine, city: dto.city, state: dto.state,
-          country: dto.country ?? DEFAULT_COUNTRY, postalCode: dto.postalCode,
-          latitude: dto.latitude ?? null, longitude: dto.longitude ?? null,
-          timezone: dto.timezone ?? DEFAULT_TIMEZONE, phone: dto.phone ?? null, email: dto.email ?? null,
-          openingTime: dto.openingTime, closingTime: dto.closingTime, facilities: dto.facilities ?? [],
-        }),
-      );
-      return CinemaResponseDto.from(saved);
+      // const saved = await this.cinemas.save(
+      //   this.cinemas.create({
+      //     code: dto.code, name: dto.name, addressLine: dto.addressLine, city: dto.city, state: dto.state,
+      //     country: dto.country ?? DEFAULT_COUNTRY, postalCode: dto.postalCode,
+      //     latitude: dto.latitude ?? null, longitude: dto.longitude ?? null,
+      //     timezone: dto.timezone ?? DEFAULT_TIMEZONE, phone: dto.phone ?? null, email: dto.email ?? null,
+      //     openingTime: dto.openingTime, closingTime: dto.closingTime, facilities: dto.facilities ?? [],
+      //   }),
+      // );
+      // return CinemaResponseDto.from(saved);
+          const { city, ...fields } = dto;
+    const cinema = this.cinemas.create({ ...fields, city: { id: city } });
+    const saved = await this.cinemas.save(cinema);
+    const full = await this.cinemas.findOneOrFail({ where: { id: saved.id }, relations: { city: true } });
+    return CinemaResponseDto.from(full);
     } catch (error) {
       if (isUniqueViolation(error)) throw new ConflictException('Cinema code already exists');
       throw error;

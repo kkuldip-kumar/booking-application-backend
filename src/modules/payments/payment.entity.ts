@@ -2,8 +2,8 @@
 import {
   Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { PaymentMode } from '../../../common/enums/payment-mode.enum';
-import { PaymentStatus } from '../../../common/enums/payment-status.enum';
+import { PaymentMode } from '../../common/enums/payment-mode.enum';
+import { PaymentStatus } from '../../common/enums/payment-status.enum';
 
 @Entity('payments')
 @Index('idx_payments_booking_created', ['bookingId', 'createdAt'])

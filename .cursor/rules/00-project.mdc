@@ -1,6 +1,6 @@
 ---
 description: Project stack and global conventions
-alwaysApply: true
+alwaysApply: false
 ---
 # Project
 BookMyShow-style ticket booking backend. See @AGENTS.md and @docs/ARCHITECTURE.md.
