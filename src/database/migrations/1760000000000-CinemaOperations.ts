@@ -14,7 +14,6 @@ export class CinemaOperations1760000000000 implements MigrationInterface {
       CREATE TYPE seat_status AS ENUM ('ACTIVE','BLOCKED');
       CREATE TYPE showtime_status AS ENUM ('SCHEDULED','BLOCKED','CANCELLED','COMPLETED');
       CREATE TYPE showtime_seat_status AS ENUM ('AVAILABLE','HELD','BOOKED','BLOCKED');
-      CREATE TYPE credit_type AS ENUM ('DIRECTOR','CAST','WRITER','PRODUCER','CINEMATOGRAPHER','COMPOSER');
     `);
     await q.query(`
       CREATE TABLE cinemas (
@@ -153,40 +152,15 @@ export class CinemaOperations1760000000000 implements MigrationInterface {
       CREATE UNIQUE INDEX uq_showtime_seat ON showtime_seats (showtime_id, seat_id);
       CREATE INDEX idx_showtime_seats_status ON showtime_seats (showtime_id, status);
       CREATE INDEX idx_showtime_seats_held_until ON showtime_seats (held_until) WHERE status = 'HELD';
-
-      CREATE TABLE people (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        name varchar(150) NOT NULL,
-        slug varchar(160) NOT NULL UNIQUE,
-        biography text, profile_image_url varchar(500), birth_date date,
-        is_active boolean NOT NULL DEFAULT true,
-        created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
-      );
-      CREATE INDEX "IDX_people_name" ON people (name);
-
-      CREATE TABLE movie_credits (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-        movie_id uuid NOT NULL REFERENCES movies(id) ON DELETE RESTRICT,
-        person_id uuid NOT NULL REFERENCES people(id) ON DELETE RESTRICT,
-        credit_type credit_type NOT NULL,
-        character_name varchar(150),
-        display_order int NOT NULL DEFAULT 0,
-        created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
-      );
-      CREATE INDEX idx_movie_credits_movie_order ON movie_credits (movie_id, credit_type, display_order);
-      CREATE INDEX "IDX_movie_credits_person_id" ON movie_credits (person_id);
-      CREATE UNIQUE INDEX uq_movie_credits_identity
-        ON movie_credits (movie_id, person_id, credit_type, COALESCE(character_name, ''));
     `);
   }
 
   public async down(q: QueryRunner): Promise<void> {
     await q.query(`
-      DROP TABLE movie_credits; DROP TABLE people;
       DROP TABLE showtime_seats; DROP TABLE showtime_pricing; DROP TABLE showtimes;
       DROP TABLE seats; DROP TABLE seat_layouts; DROP TABLE seat_types;
       DROP TABLE screen_maintenance; DROP TABLE screens; DROP TABLE cinema_images; DROP TABLE cinemas;
-      DROP TYPE credit_type; DROP TYPE showtime_seat_status; DROP TYPE showtime_status; DROP TYPE seat_status;
+      DROP TYPE showtime_seat_status; DROP TYPE showtime_status; DROP TYPE seat_status;
       DROP TYPE seat_layout_status; DROP TYPE show_format; DROP TYPE screen_status;
       DROP TYPE cinema_image_type; DROP TYPE cinema_status;
     `);

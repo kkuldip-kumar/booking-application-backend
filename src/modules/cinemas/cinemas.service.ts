@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { DEFAULT_COUNTRY, DEFAULT_TIMEZONE } from '../../common/constants/cinema.constants';
 import { CinemaStatus } from '../../common/enums/cinema.enums';
 import { JwtUser } from '../../common/interfaces/jwt-user.interface';
@@ -30,16 +30,21 @@ export class CinemasService {
 
   async create(dto: CreateCinemaDto): Promise<CinemaResponseDto> {
     try {
-      const saved = await this.cinemas.save(
-        this.cinemas.create({
-          code: dto.code, name: dto.name, addressLine: dto.addressLine, city: dto.city, state: dto.state,
-          country: dto.country ?? DEFAULT_COUNTRY, postalCode: dto.postalCode,
-          latitude: dto.latitude ?? null, longitude: dto.longitude ?? null,
-          timezone: dto.timezone ?? DEFAULT_TIMEZONE, phone: dto.phone ?? null, email: dto.email ?? null,
-          openingTime: dto.openingTime, closingTime: dto.closingTime, facilities: dto.facilities ?? [],
-        }),
-      );
-      return CinemaResponseDto.from(saved);
+      // const saved = await this.cinemas.save(
+      //   this.cinemas.create({
+      //     code: dto.code, name: dto.name, addressLine: dto.addressLine, city: dto.city, state: dto.state,
+      //     country: dto.country ?? DEFAULT_COUNTRY, postalCode: dto.postalCode,
+      //     latitude: dto.latitude ?? null, longitude: dto.longitude ?? null,
+      //     timezone: dto.timezone ?? DEFAULT_TIMEZONE, phone: dto.phone ?? null, email: dto.email ?? null,
+      //     openingTime: dto.openingTime, closingTime: dto.closingTime, facilities: dto.facilities ?? [],
+      //   }),
+      // );
+      // return CinemaResponseDto.from(saved);
+          const { city, ...fields } = dto;
+    const cinema = this.cinemas.create({ ...fields, city: { id: city } });
+    const saved = await this.cinemas.save(cinema);
+    const full = await this.cinemas.findOneOrFail({ where: { id: saved.id }, relations: { city: true } });
+    return CinemaResponseDto.from(full);
     } catch (error) {
       if (isUniqueViolation(error)) throw new ConflictException('Cinema code already exists');
       throw error;
@@ -96,6 +101,12 @@ export class CinemasService {
 
   async assertExists(id: string): Promise<void> {
     if (!(await this.cinemas.existsBy({ id }))) throw new NotFoundException('Cinema not found');
+  }
+
+  async assertAllExist(ids: readonly string[]): Promise<void> {
+    const unique = [...new Set(ids)];
+    if (unique.length === 0) return;
+    if ((await this.cinemas.count({ where: { id: In(unique) } })) !== unique.length) throw new NotFoundException('One or more cinemas not found');
   }
 
   private async findOwnedOrFail(user: JwtUser, id: string): Promise<Cinema> {

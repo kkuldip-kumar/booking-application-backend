@@ -27,7 +27,7 @@ export class CinemaResponseDto {
   static from(cinema: Cinema): CinemaResponseDto {
     return {
       id: cinema.id, code: cinema.code, name: cinema.name, addressLine: cinema.addressLine,
-      city: cinema.city, state: cinema.state, country: cinema.country, postalCode: cinema.postalCode,
+      city: cinema.city.name, state: cinema.state, country: cinema.country, postalCode: cinema.postalCode,
       latitude: cinema.latitude, longitude: cinema.longitude, timezone: cinema.timezone,
       phone: cinema.phone, email: cinema.email,
       openingTime: cinema.openingTime.slice(0, TIME_HH_MM_LENGTH),

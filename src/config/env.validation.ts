@@ -9,6 +9,7 @@ class EnvironmentVariables {
   @IsString() @IsNotEmpty() CORS_ORIGINS!: string;
   @IsString() @IsNotEmpty() SMTP_HOST!: string;
   @IsString() @IsNotEmpty() MAIL_FROM!: string;
+  @IsString() @MinLength(32) TICKET_QR_SECRET!: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): Record<string, unknown> {

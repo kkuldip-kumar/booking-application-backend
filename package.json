@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "build": "nest build",
+    "start": "node dist/main.js",
     "start:dev": "nest start --watch",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "test": "jest",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
-    "seed": "ts-node scripts/seed.ts"
+    "seed": "ts-node scripts/seed.ts",
+    "seed:cities": "ts-node scripts/seed-cities.ts"
   },
   "dependencies": {
     "@nestjs/bullmq": "^10.2.0",
