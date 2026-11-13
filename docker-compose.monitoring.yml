@@ -1,0 +1,58 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    command: ['--config.file=/etc/prometheus/prometheus.yml','--storage.tsdb.retention.time=30d','--web.enable-lifecycle']
+    volumes: ['./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro','./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro','./monitoring/rules.yml:/etc/prometheus/rules.yml:ro','prom:/prometheus']
+    ports: ['127.0.0.1:9090:9090']
+    restart: unless-stopped
+  alertmanager:
+    image: prom/alertmanager:latest
+    volumes: ['./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro','./monitoring/secrets/slack_webhook_url:/etc/alertmanager/slack_webhook_url:ro']
+    ports: ['127.0.0.1:9093:9093']
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    environment: { GF_SECURITY_ADMIN_PASSWORD: '${GRAFANA_PASSWORD}', GF_USERS_ALLOW_SIGN_UP: 'false' }
+    volumes:
+      - 'graf:/var/lib/grafana'
+      - './monitoring/grafana-ds.yml:/etc/grafana/provisioning/datasources/ds.yml:ro'
+      - './monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/d.yml:ro'
+      - './monitoring/dashboards:/var/lib/grafana/dashboards:ro'
+    ports:
+      - '127.0.0.1:3001:3000'
+    restart: unless-stopped
+  loki:
+    image: grafana/loki:latest
+    volumes: ['loki:/loki']
+    restart: unless-stopped
+  promtail:
+    image: grafana/promtail:latest
+    command: ['-config.file=/etc/promtail/config.yml']
+    volumes: ['./monitoring/promtail.yml:/etc/promtail/config.yml:ro','/var/run/docker.sock:/var/run/docker.sock:ro','pt:/tmp']
+    restart: unless-stopped
+  node-exporter:
+    image: prom/node-exporter:latest
+    pid: host
+    command: ['--path.rootfs=/host']
+    volumes: ['/:/host:ro,rslave']
+    restart: unless-stopped
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    privileged: true
+    volumes: ['/:/rootfs:ro','/var/run:/var/run:ro','/sys:/sys:ro','/var/lib/docker/:/var/lib/docker:ro']
+    restart: unless-stopped
+  blackbox:
+    image: prom/blackbox-exporter:latest
+    restart: unless-stopped
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    environment:
+      DATA_SOURCE_NAME: 'postgresql://monitor:${MONITOR_PG_PASSWORD}@postgres:5432/cinemahub?sslmode=disable'
+    depends_on: { postgres: { condition: service_healthy } }
+    restart: unless-stopped
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    environment: { REDIS_ADDR: 'redis://redis:6379' }
+    depends_on: { redis: { condition: service_healthy } }
+    restart: unless-stopped
+volumes: { prom: {}, graf: {}, loki: {}, pt: {} }

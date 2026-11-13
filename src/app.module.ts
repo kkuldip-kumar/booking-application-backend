@@ -48,6 +48,7 @@ import { OfferMovie } from './modules/offers/entities/offer-movie.entity';
 import { OfferPaymentRule } from './modules/offers/entities/offer-payment-rule.entity';
 import { Coupon } from './modules/offers/entities/coupon.entity';
 import { OfferRedemption } from './modules/offers/entities/offer-redemption.entity';
+import { MonitoringModule } from './monitoring/monitoring.module';
 
 export const ENTITIES = [
   User, Role, Permission, UserRole, RefreshToken, VerificationToken, AuditLog,
@@ -58,6 +59,7 @@ export const ENTITIES = [
 
 @Module({
   imports: [
+    MonitoringModule,
     ConfigModule.forRoot({ isGlobal: true, load: [appConfig, authConfig, databaseConfig, mailConfig], validate: validateEnv }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     TypeOrmModule.forRootAsync({
@@ -76,6 +78,7 @@ export const ENTITIES = [
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({ connection: { url: config.getOrThrow<string>('database.redisUrl') } }),
     }),
+    
     AuthModule,
     UsersModule,
     CitiesModule,
