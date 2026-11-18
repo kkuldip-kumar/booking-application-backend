@@ -62,4 +62,3 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # keep src/config tracked
 !src/config/
 graphify-out/
-/monitoring/secrets/

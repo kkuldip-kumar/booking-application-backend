@@ -21,22 +21,16 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.4.0",
     "@nestjs/swagger": "^7.4.0",
-    "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^6.2.0",
     "@nestjs/typeorm": "^10.0.2",
-    "@sentry/nestjs": "^11.12.0",
     "argon2": "^0.41.1",
     "bullmq": "^5.12.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "helmet": "^7.1.0",
-    "nestjs-pino": "^4.6.1",
     "nodemailer": "^6.9.14",
     "pg": "^8.12.0",
-    "pino-http": "^11.0.0",
-    "pino-pretty": "^13.2.0",
-    "prom-client": "^15.1.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
@@ -55,16 +49,10 @@
     "typescript": "^5.5.0"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
+    "moduleFileExtensions": ["js", "json", "ts"],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
+    "transform": { "^.+\\.ts$": "ts-jest" },
     "testEnvironment": "node"
   }
 }
