@@ -1,4 +1,4 @@
-import { Logger, RequestMethod, ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -8,7 +8,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { metricsMiddleware, startMetricsServer } from './monitoring/metrics';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
@@ -20,12 +19,7 @@ async function bootstrap(): Promise<void> {
   app.enableCors({ origin: config.getOrThrow<string[]>('app.corsOrigins'), credentials: true });
   app.set('trust proxy', 1);
   app.disable('x-powered-by');
-  app.setGlobalPrefix('api/v1', {
-    exclude: [
-      { path: 'health/live', method: RequestMethod.GET },
-      { path: 'health/ready', method: RequestMethod.GET },
-    ],
-  });
+  app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
@@ -34,9 +28,7 @@ async function bootstrap(): Promise<void> {
     const doc = SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('CinemaHub API').addCookieAuth('access_token').build());
     SwaggerModule.setup('docs', app, doc);
   }
-  app.use(metricsMiddleware);
   await app.listen(config.getOrThrow<number>('app.port'));
-  startMetricsServer(9464);
   new Logger('Bootstrap').log('CinemaHub API started');
 }
 
