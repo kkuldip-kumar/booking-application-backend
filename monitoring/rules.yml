@@ -1,0 +1,10 @@
+groups:
+- name: api_slis
+  interval: 30s
+  rules:
+  - { record: api:tps, expr: 'sum(rate(http_request_duration_seconds_count[1m]))' }
+  - { record: 'api:latency:p90', expr: 'histogram_quantile(0.90, sum by (le,route) (rate(http_request_duration_seconds_bucket[5m])))' }
+  - { record: 'api:latency:p95', expr: 'histogram_quantile(0.95, sum by (le,route) (rate(http_request_duration_seconds_bucket[5m])))' }
+  - { record: 'api:latency:p99', expr: 'histogram_quantile(0.99, sum by (le,route) (rate(http_request_duration_seconds_bucket[5m])))' }
+  - record: api:success_ratio
+    expr: '1 - (sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m])) / sum(rate(http_request_duration_seconds_count[5m])))'

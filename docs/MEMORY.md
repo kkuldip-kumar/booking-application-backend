@@ -9,6 +9,7 @@ Append newest at top. Format: `YYYY-MM-DD — <topic>: <decision/gotcha> — <wh
 - Hold TTL = 10 minutes; max 6 seats per booking.
 
 ## Gotchas
+- 2026-11-13 — Keep `@nestjs/terminus` and `nestjs-pino` on releases compatible with NestJS 10; newer majors require NestJS 11/12 and make Docker's strict `npm ci` fail. Keep npm and pnpm lockfiles in sync with `package.json`.
 - 2026-10-22 — CinemaOperations must not recreate `people`/`movie_credits`; those belong to CreateMoviesModule. Duplicate DDL caused migration failure (`relation "people" already exists`).
 - (add) Always pass the transaction `EntityManager` into nested service calls, or locks won't apply.
 - (add) `SKIP LOCKED` returns fewer rows; compare count to requested seats, else 409.

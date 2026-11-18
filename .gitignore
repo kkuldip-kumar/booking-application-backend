@@ -68,3 +68,6 @@ graphify-out/
 .cursor/
 .cursorrules
 CLAUDE.md
+#=======
+/monitoring/secrets/
+
