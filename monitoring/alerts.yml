@@ -1,0 +1,93 @@
+groups:
+- name: availability
+  rules:
+  - alert: Watchdog            # always firing; route to a heartbeat service if you want "monitoring is alive" proof
+    expr: vector(1)
+    labels: { severity: none }
+  - alert: AppDown
+    expr: up{job="app"} == 0 or probe_success == 0
+    for: 1m
+    labels: { severity: critical }
+    annotations: { summary: 'ticket-backend is DOWN', description: 'Scrape or health probe failing for {{ $labels.instance }} for 1m' }
+  - alert: AppRestarting
+    expr: changes(process_start_time_seconds{job="app"}[15m]) > 2
+    labels: { severity: critical }
+    annotations: { summary: 'ticket-backend restarted {{ $value }}x in 15m (crash loop / OOM)' }
+  - alert: PostgresDown
+    expr: pg_up == 0
+    for: 1m
+    labels: { severity: critical }
+    annotations: { summary: 'Postgres is DOWN' }
+  - alert: RedisDown
+    expr: redis_up == 0
+    for: 1m
+    labels: { severity: critical }
+    annotations: { summary: 'Redis is DOWN' }
+- name: app
+  rules:
+  - alert: High5xxRate
+    expr: sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m])) / sum(rate(http_request_duration_seconds_count[5m])) > 0.02
+    for: 5m
+    labels: { severity: critical }
+    annotations: { summary: '5xx rate {{ $value | humanizePercentage }} (threshold 2%)' }
+  - alert: SLOBurnFast          # 99.9% SLO, 14.4x burn
+    expr: sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m])) / sum(rate(http_request_duration_seconds_count[5m])) > 0.0144
+    for: 5m
+    labels: { severity: critical }
+    annotations: { summary: 'Error budget burning 14x too fast' }
+  - alert: HighP95Latency
+    expr: 'api:latency:p95 > 1'
+    for: 10m
+    labels: { severity: warning }
+    annotations: { summary: 'p95 {{ $value | humanizeDuration }} on {{ $labels.route }}' }
+  - alert: HighP99Latency
+    expr: 'histogram_quantile(0.99, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 3'
+    for: 10m
+    labels: { severity: warning }
+    annotations: { summary: 'Overall p99 latency above 3s' }
+  - alert: EventLoopLag
+    expr: nodejs_eventloop_lag_p99_seconds > 0.2
+    for: 5m
+    labels: { severity: warning }
+    annotations: { summary: 'Event loop p99 lag {{ $value }}s (CPU-bound code?)' }
+  - alert: HeapNearLimit
+    expr: nodejs_heap_size_used_bytes / nodejs_heap_size_total_bytes > 0.9
+    for: 10m
+    labels: { severity: warning }
+    annotations: { summary: 'Node heap above 90% (possible leak)' }
+  - alert: PgPoolWaiting
+    expr: pg_pool_connections{state="waiting"} > 0
+    for: 2m
+    labels: { severity: warning }
+    annotations: { summary: 'Requests waiting on Postgres pool' }
+  - alert: QueueOldestJobStale
+    expr: queue_oldest_waiting_age_seconds > 60
+    for: 5m
+    labels: { severity: warning }
+    annotations: { summary: 'Queue {{ $labels.queue }}: oldest job waiting {{ $value }}s' }
+  - alert: QueueFailing
+    expr: bullmq_jobs{state="failed"} > 20
+    for: 10m
+    labels: { severity: warning }
+    annotations: { summary: 'Queue {{ $labels.queue }}: {{ $value }} failed jobs' }
+- name: infra
+  rules:
+  - alert: HighCPU
+    expr: 100 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100 > 85
+    for: 10m
+    labels: { severity: warning }
+    annotations: { summary: 'VM CPU {{ $value | printf "%.0f" }}%' }
+  - alert: LowMemory
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.10
+    for: 5m
+    labels: { severity: critical }
+    annotations: { summary: 'VM available memory below 10%' }
+  - alert: DiskAlmostFull
+    expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.15
+    for: 5m
+    labels: { severity: critical }
+    annotations: { summary: 'Root disk below 15% free' }
+  - alert: ContainerOOMKilled
+    expr: increase(container_oom_events_total[15m]) > 0
+    labels: { severity: critical }
+    annotations: { summary: 'Container {{ $labels.name }} OOM-killed' }
